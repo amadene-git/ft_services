@@ -1,23 +1,13 @@
-FROM alpine
+FROM alpine:3.12.0
 
-RUN apk update
-RUN apk add openrc --no-cache
+
+COPY start.sh /usr/sbin/start.sh
+COPY default.conf /etc/nginx/conf.d/
+
 RUN apk add vim
-RUN apk add nginx
+RUN apk add --no-cache nginx
 
+ENTRYPOINT ["/usr/sbin/start.sh"]
 
-RUN adduser -D -g 'www' www
-RUN mkdir /www
-RUN chown -R www:www /var/lib/nginx
-RUN chown -R www:www /www
-RUN  mkdir -p /run/nginx
-
-
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY index.html /www/index.html
-COPY start.sh   /root/start.sh
-
-EXPOSE 80 
-
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+EXPOSE 80
 

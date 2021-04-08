@@ -4,8 +4,8 @@ minikube stop
 minikube delete
 minikube start --vm-driver=docker
 
-
-IP_EXT= $(minikube ip)
+eval $(minikube docker-env)
+export IP_EXT=$(minikube ip)
 
 #MetalLB
 
@@ -29,7 +29,7 @@ data:
     - name: default
       protocol: layer2
       addresses:
-      - $IP_EXT-192.168.49.42
+      - ${IP_EXT}/32
 EOF
 
 #kubectl apply -f nginx/nginx.yaml
