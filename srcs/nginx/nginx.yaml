@@ -1,39 +1,41 @@
-# Please edit the object below. Lines beginning with a '#' will be ignored,
-# and an empty file will abort the edit. If an error occurs while saving this file will be
-# reopened with the relevant failures.
-#
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-depl
+  name: nginx
   labels:
     app: nginx
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: nginx
   template:
     metadata:
       labels:
-        app: nginx  
+        app: nginx
     spec:
       containers:
       - name: nginx
-        image: nginx
+        image: nginx-svc
+        imagePullPolicy: Never
         ports:
-        - containerPort: 8080
----       
+        - containerPort: 80
+          name: http-port
 
+---
+  
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx-service
-spec:   
+  name: nginx
+  annotations:
+    metallb.universe.tf/allow-shared-ip: "sharing key"
+spec:
   selector:
     app: nginx
+  type: LoadBalancer
+  loadBalancerIP: 192.168.49.2
   ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 8080
-
+  - port: 80
+    name: http-port
+    targetPort: 80
+    protocol: TCP

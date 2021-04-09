@@ -32,4 +32,8 @@ data:
       - ${IP_EXT}/32
 EOF
 
-#kubectl apply -f nginx/nginx.yaml
+#nginx
+eval $(minikube docker-env)
+docker build -t nginx-svc srcs/nginx/
+eval $(minikube docker-env)
+kubectl apply -f srcs/nginx/nginx.yaml
