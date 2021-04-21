@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql-image
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5050
+          name: mysql-port
+
+---
+  
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  annotations:
+    metallb.universe.tf/allow-shared-ip: "sharing key"
+spec:
+  selector:
+    app: mysql
+  type: LoadBalancer
+  loadBalancerIP: 192.168.49.2
+  ports:
+  - port: 5050
+    name: mysql-port
+    targetPort: 5050
+    protocol: TCP

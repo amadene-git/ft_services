@@ -1,11 +1,15 @@
 #!/bin/bash
 
+
+#start minikube
+
 minikube stop
 minikube delete
 minikube start --vm-driver=docker
 
-eval $(minikube docker-env)
 export IP_EXT=$(minikube ip)
+
+
 
 #MetalLB
 
@@ -35,5 +39,11 @@ EOF
 #nginx
 eval $(minikube docker-env)
 docker build -t nginx-svc srcs/nginx/
-eval $(minikube docker-env)
-kubectl apply -f srcs/nginx/nginx.yaml
+
+
+chmod +x srcs/*/*.sh
+
+#eval $(minikube docker-env)
+
+envsubst '$IP_EXT' < srcs/nginx/nginx.yaml > srcs/yamlfiles/nginx.yaml
+kubectl apply -f srcs/yamlfiles/nginx.yaml

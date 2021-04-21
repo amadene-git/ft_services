@@ -20,6 +20,8 @@ spec:
         ports:
         - containerPort: 80
           name: http-port
+        - containerPort: 443
+          name: https-port
 
 ---
   
@@ -33,9 +35,13 @@ spec:
   selector:
     app: nginx
   type: LoadBalancer
-  loadBalancerIP: 192.168.49.2
+  loadBalancerIP: $IP_EXT
   ports:
   - port: 80
     name: http-port
     targetPort: 80
+    protocol: TCP
+  - port: 443
+    name: https-port
+    targetPort: 443
     protocol: TCP
