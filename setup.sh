@@ -9,14 +9,11 @@ minikube start --vm-driver=docker
 
 export IP_EXT=$(minikube ip)
 
-
-
 #MetalLB
 
 kubectl get configmap kube-proxy -n kube-system -o yaml | \
 sed -e "s/strictARP: false/strictARP: true/" | \
 kubectl apply -f - -n kube-system
-
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.6/manifests/namespace.yaml
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.6/manifests/metallb.yaml
 kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
@@ -36,14 +33,18 @@ data:
       - ${IP_EXT}/32
 EOF
 
-#nginx
-eval $(minikube docker-env)
-docker build -t nginx-svc srcs/nginx/
-
-
 chmod +x srcs/*/*.sh
 
-#eval $(minikube docker-env)
+#build
+eval $(minikube docker-env)
+docker build -t nginx-img srcs/nginx/
+docker build -t mysql-img srcs/mysql/
 
+
+#apply
 envsubst '$IP_EXT' < srcs/nginx/nginx.yaml > srcs/yamlfiles/nginx.yaml
+envsubst '$IP_EXT' < srcs/mysql/mysql.yaml > srcs/yamlfiles/mysql.yaml
+
 kubectl apply -f srcs/yamlfiles/nginx.yaml
+kubectl apply -f srcs/yamlfiles/mysql.yaml
+

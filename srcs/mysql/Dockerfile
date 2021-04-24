@@ -1,7 +1,8 @@
 FROM alpine:3.12.0
 
-COPY start.sh /usr/sbin/
+RUN apk add --no-cache mysql mysql-client
 
-EXPOSE 5050
+COPY init_db.sh .
+COPY start.sh 	/usr/sbin/
 
 ENTRYPOINT ["usr/sbin/start.sh"]
