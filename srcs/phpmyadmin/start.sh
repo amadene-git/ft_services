@@ -1,23 +1,21 @@
 #!/bin/sh
+mv /var/www/phpMyAdmin-5.0.4-all-languages.tar.gz /var/www/phpmyadmin.tar.gz
+tar -xvf /var/www/phpmyadmin.tar.gz
+rm /var/www/phpmyadmin.tar.gz
+mv phpMyAdmin-5.0.4-all-languages/ phpmyadmin
 
-
-mv /var/www/phpmyadmin/phpMyAdmin-5.0.4-all-languages.tar.gz /var/www/phpmyadmin/phpmyadmin.tar.gz
-tar -xvf /var/www/phpmyadmin/phpmyadmin.tar.gz
-
-rm /var/www/phpmyadmin/phpmyadmin.tar.gz
-#sed s/localhost/$WP_DB_HOST/g /var/www/phpmyadmin/config.sample.inc.php > /var/www/phpmyadmin/config.inc.php
+#sed -i s/localhost/mysql/g /var/www/phpmyadmin/config.sample.inc.php
 #echo "\$cfg['PmaAbsoluteUri'] = './';" >> /var/www/phpmyadmin/config.inc.php
-
-
-# ssl certificate
-# Create ssl certificate
-#openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-#    -subj "/C=FR/ST=75/L=Paris/O=42/CN=tvideira"    \
-#    -keyout /etc/ssl/private/nginx-selfsigned.key   \
-#    -out /etc/ssl/certs/nginx-selfsigned.crt
+cat /root/config.inc.php > /var/www/phpmyadmin/config.inc.php
+rm -rf /var/www/phpmyadmin/config.sample.inc.php
+ 
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -subj "/C=FR/ST=75/L=Paris/O=42/CN=amadene"    \
+    -keyout /etc/ssl/private/nginx-selfsigned.key   \
+    -out /etc/ssl/certs/nginx-selfsigned.crt
 
 # Create this directory or change it in configs order to launch nginx
-#mkdir -p /run/nginx
+mkdir -p /run/nginx
 
 #mkdir -p /etc/telegraf
 #telegraf -sample-config --input-filter cpu:mem:net:swap:diskio --output-filter influxdb > /etc/telegraf/telegraf.conf
@@ -35,7 +33,6 @@ then
 fi
 
 
- Start php-fpm7
 php-fpm7
 status=$?
 if [ $status -ne 0 ];
