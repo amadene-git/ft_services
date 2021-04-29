@@ -37,17 +37,20 @@ chmod +x srcs/*/*.sh
 
 #build
 eval $(minikube docker-env)
-docker build -t nginx-img srcs/nginx/
-docker build -t mysql-img srcs/mysql/
-docker build -t phpmyadmin-img srcs/phpmyadmin/
+docker build -t nginx-img 		srcs/nginx/ --network=host
+docker build -t mysql-img 		srcs/mysql/ --network=host
+docker build -t phpmyadmin-img 	srcs/phpmyadmin/ --network=host
+docker build -t wordpress-img	srcs/wordpress/ --network=host
 
 
 #apply
 envsubst '$IP_EXT' < srcs/nginx/nginx.yaml > srcs/yamlfiles/nginx.yaml
 envsubst '$IP_EXT' < srcs/mysql/mysql.yaml > srcs/yamlfiles/mysql.yaml
 envsubst '$IP_EXT' < srcs/phpmyadmin/phpmyadmin.yaml > srcs/yamlfiles/phpmyadmin.yaml
+envsubst '$IP_EXT' < srcs/wordpress/wordpress.yaml > srcs/yamlfiles/wordpress.yaml
 
 kubectl apply -f srcs/yamlfiles/nginx.yaml
 kubectl apply -f srcs/yamlfiles/mysql.yaml
 kubectl apply -f srcs/yamlfiles/phpmyadmin.yaml
+kubectl apply -f srcs/yamlfiles/wordpress.yaml
 

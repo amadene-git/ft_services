@@ -3,6 +3,8 @@
 mkdir -p /run/nginx
 mkdir -p /var/www/html
 
+sed -i s/__IP_EXT__/$IP_EXT/g /etc/nginx/conf.d/default.conf
+
 openssl req -x509 -nodes -days 365 \
 	-subj "/C=CA/ST=QC/O=Company, Inc./CN=mydomain.com" \
 	-newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key \
@@ -10,4 +12,17 @@ openssl req -x509 -nodes -days 365 \
 
 echo "nginx server is ok" > /var/www/html/index.html
 
-nginx -g 'daemon off;'
+nginx -g 'daemon off;' &\
+while sleep 60; do
+    ps aux |grep nginx |grep -q -v grep
+    PROCESS_1_STATUS=$?
+   # ps aux |grep telegraf |grep -q -v grep
+   # PROCESS_2_STATUS=$?
+    # If the greps above find anything, they exit with 0 status
+    # If they are not both 0, then something is wrong
+    if [ $PROCESS_1_STATUS -ne 0 ];
+    then
+        echo "One of the processes has already exited."
+        exit 1
+    fi
+done

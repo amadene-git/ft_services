@@ -22,7 +22,9 @@ spec:
           name: http-port
         - containerPort: 443
           name: https-port
-
+        env:
+        - name: IP_EXT
+          value: 192.168.49.2
 ---
   
 apiVersion: v1
