@@ -1,9 +1,13 @@
 #!/bin/sh
 
-RUN /usr/sbin/influxd & sleep 3 &&\
-influx -execute "CREATE DATABASE grafana" &&\
-influx -execute "CREATE USER ljurdant WITH PASSWORD 'yo'" &&\
-influx -execute "GRANT ALL ON grafana TO ljurdant" &\
+#mkdir -p /var/lib/influxdb/data
+#mkdir -p /var/lib/influxdb/wal
+#mkdir -p /var/lib/influxdb/met
+
+/usr/sbin/influxd & sleep 3
+influx -execute "CREATE DATABASE grafana" 
+influx -execute "CREATE USER user WITH PASSWORD '1234'"
+influx -execute "GRANT ALL ON grafana TO user"
 
 while sleep 60; do
     ps aux |grep influxd |grep -q -v grep

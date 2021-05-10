@@ -12,7 +12,7 @@ RUN wget https://files.phpmyadmin.net/phpMyAdmin/5.0.4/phpMyAdmin-5.0.4-all-lang
 COPY start.sh 		/usr/sbin/start.sh
 COPY default.conf  	/etc/nginx/conf.d/default.conf
 COPY config.inc.php /root/
-
+COPY www.conf		/root/
 EXPOSE 5000
 
 ENTRYPOINT ["/usr/sbin/start.sh"]

@@ -5,7 +5,7 @@ tar -xvf /var/www/phpmyadmin.tar.gz
 rm /var/www/phpmyadmin.tar.gz
 mv phpMyAdmin-5.0.4-all-languages/ phpmyadmin
 mv /root/config.inc.php  /var/www/phpmyadmin/config.inc.php
-#rm -rf /var/www/phpmyadmin/config.sample.inc.php
+rm -rf /var/www/phpmyadmin/config.sample.inc.php
  
 echo "\$cfg['PmaAbsoluteUri'] = './';" >> /var/www/phpmyadmin/config.inc.php
 
@@ -15,14 +15,8 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -keyout /etc/ssl/private/nginx-selfsigned.key   \
     -out /etc/ssl/certs/nginx-selfsigned.crt
 
-# Create this directory or change it in configs order to launch nginx
 mkdir -p /run/nginx
 
-#mkdir -p /etc/telegraf
-#telegraf -sample-config --input-filter cpu:mem:net:swap:diskio --output-filter influxdb > /etc/telegraf/telegraf.conf
-#sed -i s/'# urls = \["http:\/\/127.0.0.1:8086"\]'/'urls = ["http:\/\/influxdb:8086"]'/ /etc/telegraf/telegraf.conf
-#sed -i s/'# database = "telegraf"'/'database = "phpmyadmin"'/ /etc/telegraf/telegraf.conf
-#sed -i s/'omit_hostname = false'/'omit_hostname = true'/ /etc/telegraf/telegraf.conf
 
 nginx
 status=$?
@@ -41,16 +35,12 @@ then
 	exit $status
 fi
 
-# Start telegraf
-#telegraf &
 
 while sleep 60; do
     ps aux |grep nginx |grep -q -v grep
      PROCESS_1_STATUS=$?
     ps aux |grep php-fpm |grep -q -v grep
     PROCESS_2_STATUS=$?
-    #ps aux |grep telegraf |grep -q -v grep
-    #PROCESS_3_STATUS=$?
     if [ $PROCESS_1_STATUS -ne 0 -o $PROCESS_2_STATUS -ne 0 ];
     then
         echo "One of the processes has already exited."
