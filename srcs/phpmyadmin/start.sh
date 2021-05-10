@@ -16,7 +16,8 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -out /etc/ssl/certs/nginx-selfsigned.crt
 
 mkdir -p /run/nginx
-
+mkdir -p /var/www/phpmyadmin/tmp/
+chmod 777 /var/www/phpmyadmin/tmp/
 
 nginx
 status=$?
