@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telegraf-config
+data:
+  telegraf.conf: |+
+    [agent]
+      interval = "5s"
+    [[outputs.influxdb]]
+    urls = ["http://influxdb:8086"]
+      database = "grafana"
+      username = "graf_user"
+      password = "1234"
+    [[inputs.docker]]
+      endpoint = "unix:///var/run/docker.sock"
+      gather_services = false
+      container_names = []
+      source_tag = false
+      container_name_include = []
+      container_name_exclude = []
+      timeout = "5s"
+      perdevice = true
+      total = false
+      docker_label_include = []
+      docker_label_exclude = ["*annotation.kubernetes*"]
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telegraf
+spec:
+  selector:
+    matchLabels:
+            app: telegraf
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: telegraf
+    spec:
+      containers:
+      - image: telegraf-img
+        imagePullPolicy: Never
+        name: telegraf
+        ports:
+        - containerPort: 8125
+        volumeMounts:
+        - name: telegraf-config
+          mountPath: /etc/telegraf/telegraf.conf
+          subPath: telegraf.conf
+          readOnly: true
+        - name: docker-socket
+          mountPath: "/var/run/docker.sock"
+      volumes:
+      - name: telegraf-config
+        configMap:
+          name: telegraf-config
+      - name: docker-socket
+        hostPath:
+          path: /var/run/docker.sock
+ 
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: telegraf
+  annotations:
+    metallb.universe.tf/allow-shared-ip: sharing key
+spec:
+  selector:
+    app: telegraf
+  ports:
+    - name: telegraf
+      protocol: TCP
+      port: 8125
+      targetPort: 8125
+  type: ClusterIP
+  loadBalancerIP: 192.168.49.2
