@@ -78,4 +78,4 @@ spec:
       port: 8125
       targetPort: 8125
   type: ClusterIP
-  loadBalancerIP: $IP_EXT
+  loadBalancerIP: 192.168.49.2

@@ -7,6 +7,9 @@ minikube stop
 minikube delete
 minikube start --vm-driver=docker
 
+minikube addons enable metrics-server
+minikube addons enable dashboard
+
 export IP_EXT=$(minikube ip)
 
 #MetalLB
@@ -39,25 +42,28 @@ chmod +x srcs/*/*.sh
 eval $(minikube docker-env)
 docker build -t nginx-img 		srcs/nginx/ --network=host
 docker build -t mysql-img 		srcs/mysql/ --network=host
-docker build -t phpmyadmin-img 	srcs/phpmyadmin/ --network=host
-docker build -t wordpress-img	srcs/wordpress/ --network=host
-docker build -t influxdb-img	srcs/influxdb/ --network=host
-#docker build -t grafana-img		srcs/grafana/ --network=host
+docker build -t phpmyadmin-img 		srcs/phpmyadmin/ --network=host
+docker build -t wordpress-img		srcs/wordpress/ --network=host
+docker build -t influxdb-img		srcs/influxdb/ --network=host
+docker build -t grafana-img		srcs/grafana/ --network=host
+docker build -t telegraf-img		srcs/telegraf/ --network=host
 
 #apply
-envsubst '$IP_EXT' < srcs/nginx/nginx.yaml 				> srcs/yamlfiles/nginx.yaml
-envsubst '$IP_EXT' < srcs/mysql/mysql.yaml 				> srcs/yamlfiles/mysql.yaml
-envsubst '$IP_EXT' < srcs/phpmyadmin/phpmyadmin.yaml 	> srcs/yamlfiles/phpmyadmin.yaml
+envsubst '$IP_EXT' < srcs/nginx/nginx.yaml 			> srcs/yamlfiles/nginx.yaml
+envsubst '$IP_EXT' < srcs/mysql/mysql.yaml 			> srcs/yamlfiles/mysql.yaml
+envsubst '$IP_EXT' < srcs/phpmyadmin/phpmyadmin.yaml 		> srcs/yamlfiles/phpmyadmin.yaml
 envsubst '$IP_EXT' < srcs/wordpress/wordpress.yaml 		> srcs/yamlfiles/wordpress.yaml
 envsubst '$IP_EXT' < srcs/influxdb/influxdb.yaml 		> srcs/yamlfiles/influxdb.yaml
-#envsubst '$IP_EXT' < srcs/grafana/grafana.yaml			> srcs/yamlfiles/grafana.yaml
+envsubst '$IP_EXT' < srcs/grafana/grafana.yaml			> srcs/yamlfiles/grafana.yaml
+envsubst '$IP_EXT' < srcs/telegraf/telegraf.yaml		> srcs/yamlfiles/telegraf.yaml
 
 kubectl apply -f srcs/yamlfiles/nginx.yaml
 kubectl apply -f srcs/yamlfiles/mysql.yaml
 kubectl apply -f srcs/yamlfiles/phpmyadmin.yaml
 kubectl apply -f srcs/yamlfiles/wordpress.yaml
 kubectl apply -f srcs/yamlfiles/influxdb.yaml
-#kubectl apply -f srcs/yamlfiles/grafana.yaml
+kubectl apply -f srcs/yamlfiles/grafana.yaml
+kubectl apply -f srcs/yamlfiles/telegraf.yaml
 
 
 
