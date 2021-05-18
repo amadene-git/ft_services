@@ -3,8 +3,10 @@
 
 #start minikube
 
+
 minikube stop
 minikube delete
+rm -rf srcs/yamlfiles/*.yaml
 minikube start --vm-driver=docker
 
 minikube addons enable metrics-server
@@ -40,31 +42,37 @@ chmod +x srcs/*/*.sh
 
 #build
 eval $(minikube docker-env)
-docker build -t nginx-img 		srcs/nginx/ --network=host
-docker build -t mysql-img 		srcs/mysql/ --network=host
+docker build -t nginx-img 			srcs/nginx/ --network=host
+docker build -t mysql-img 			srcs/mysql/ --network=host
 docker build -t phpmyadmin-img 		srcs/phpmyadmin/ --network=host
 docker build -t wordpress-img		srcs/wordpress/ --network=host
 docker build -t influxdb-img		srcs/influxdb/ --network=host
-docker build -t grafana-img		srcs/grafana/ --network=host
+docker build -t grafana-img			srcs/grafana/ --network=host
 docker build -t telegraf-img		srcs/telegraf/ --network=host
+envsubst '$IP_EXT' < srcs/ftps/vsftpd.conf 				> srcs/ftps/vsftpd2.conf
+docker build -t ftps-img			srcs/ftps/ --network=host
 
 #apply
-envsubst '$IP_EXT' < srcs/nginx/nginx.yaml 			> srcs/yamlfiles/nginx.yaml
-envsubst '$IP_EXT' < srcs/mysql/mysql.yaml 			> srcs/yamlfiles/mysql.yaml
-envsubst '$IP_EXT' < srcs/phpmyadmin/phpmyadmin.yaml 		> srcs/yamlfiles/phpmyadmin.yaml
+envsubst '$IP_EXT' < srcs/nginx/nginx.yaml 				> srcs/yamlfiles/nginx.yaml
+envsubst '$IP_EXT' < srcs/mysql/mysql.yaml 				> srcs/yamlfiles/mysql.yaml
+envsubst '$IP_EXT' < srcs/phpmyadmin/phpmyadmin.yaml 	> srcs/yamlfiles/phpmyadmin.yaml
 envsubst '$IP_EXT' < srcs/wordpress/wordpress.yaml 		> srcs/yamlfiles/wordpress.yaml
 envsubst '$IP_EXT' < srcs/influxdb/influxdb.yaml 		> srcs/yamlfiles/influxdb.yaml
 envsubst '$IP_EXT' < srcs/grafana/grafana.yaml			> srcs/yamlfiles/grafana.yaml
 envsubst '$IP_EXT' < srcs/telegraf/telegraf.yaml		> srcs/yamlfiles/telegraf.yaml
+envsubst '$IP_EXT' < srcs/ftps/ftps.yaml				> srcs/yamlfiles/ftps.yaml
 
-kubectl apply -f srcs/yamlfiles/nginx.yaml
-kubectl apply -f srcs/yamlfiles/mysql.yaml
-kubectl apply -f srcs/yamlfiles/phpmyadmin.yaml
-kubectl apply -f srcs/yamlfiles/wordpress.yaml
-kubectl apply -f srcs/yamlfiles/influxdb.yaml
-kubectl apply -f srcs/yamlfiles/grafana.yaml
-kubectl apply -f srcs/yamlfiles/telegraf.yaml
+#kubectl apply -f srcs/yamlfiles/nginx.yaml
+#kubectl apply -f srcs/yamlfiles/mysql.yaml
+#kubectl apply -f srcs/yamlfiles/phpmyadmin.yaml
+#kubectl apply -f srcs/yamlfiles/wordpress.yaml
+#kubectl apply -f srcs/yamlfiles/influxdb.yaml
+#kubectl apply -f srcs/yamlfiles/grafana.yaml
+#kubectl apply -f srcs/yamlfiles/telegraf.yaml
+#kubectl apply -f srcs/yamlfiles/ftps.yaml
+kubectl apply -f srcs/yamlfiles/
 
+minikube dashboard
 
 
 

@@ -1,11 +1,9 @@
 #!/bin/sh
 
-sed s/domain = localhost/"domain = ${IP_EXT}"/g /usr/share/grafana/conf/defaults.ini
-
-grafana-server -homepath=/usr/share/grafana/ &
+vsftpd /etc/vsftpd/vsftpd.conf 
 
 while sleep 60; do
-    ps aux |grep grafana-server |grep -q -v grep
+    ps aux |grep vsftpd |grep -q -v grep
     PROCESS_1_STATUS=$?
     if [ $PROCESS_1_STATUS -ne 0 ];
     then
@@ -13,3 +11,4 @@ while sleep 60; do
         exit 1
     fi
 done
+
